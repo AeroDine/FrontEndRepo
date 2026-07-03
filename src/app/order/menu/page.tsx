@@ -2,15 +2,15 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ShoppingBag } from "lucide-react";
+import { Search, SlidersHorizontal, Star } from "lucide-react";
 import { useState } from "react";
 import { MobileShell } from "@/components/layout/mobile-shell";
 import { DietIndicator } from "@/components/ui/diet-indicator";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import {
   DEMO_RESTAURANT,
   MENU_CATEGORIES,
+  MENU_ITEMS,
   getCategoryItems,
 } from "@/lib/mock-data";
 import { formatCurrency } from "@/lib/utils";
@@ -18,29 +18,33 @@ import { useCartStore } from "@/stores/cart-store";
 import { cn } from "@/lib/utils";
 
 export default function MenuPage() {
-  const [activeCategory, setActiveCategory] = useState(MENU_CATEGORIES[0].id);
+  const [activeCategory, setActiveCategory] = useState("cat-all");
   const itemCount = useCartStore((s) => s.itemCount());
-  const items = getCategoryItems(activeCategory);
+  const total = useCartStore((s) => s.subtotal());
+
+  const items =
+    activeCategory === "cat-all"
+      ? MENU_ITEMS
+      : getCategoryItems(activeCategory);
+  const specials = MENU_ITEMS.filter((i) => i.categoryId === "cat-popular");
+  const mains = MENU_ITEMS.filter((i) => i.categoryId === "cat-mains");
 
   return (
     <MobileShell>
-      <header className="sticky top-0 z-10 bg-card/95 backdrop-blur border-b border-border px-4 py-4">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <h1 className="font-bold text-lg">{DEMO_RESTAURANT.name}</h1>
-            <p className="text-xs text-muted">Table {DEMO_RESTAURANT.tableNumber}</p>
+      <header className="sticky top-0 z-10 bg-white border-b border-border px-5 pt-5 pb-3">
+        <p className="text-[10px] font-bold tracking-[0.2em] text-muted uppercase">
+          {DEMO_RESTAURANT.name}
+        </p>
+        <div className="flex items-center justify-between mt-1">
+          <h1 className="text-2xl font-extrabold">Digital Menu</h1>
+          <div className="flex gap-2">
+            <button type="button" className="p-2.5 rounded-full border border-border" aria-label="Search">
+              <Search size={18} />
+            </button>
+            <button type="button" className="p-2.5 rounded-full border border-border" aria-label="Filter">
+              <SlidersHorizontal size={18} />
+            </button>
           </div>
-          <Link
-            href="/order/cart"
-            className="relative p-2.5 rounded-xl bg-primary-light text-primary"
-          >
-            <ShoppingBag size={22} />
-            {itemCount > 0 && (
-              <span className="absolute -top-1 -right-1 w-5 h-5 rounded-full bg-primary text-white text-xs font-bold flex items-center justify-center">
-                {itemCount}
-              </span>
-            )}
-          </Link>
         </div>
 
         <div className="flex gap-2 mt-4 overflow-x-auto pb-1 scrollbar-hide">
@@ -52,66 +56,89 @@ export default function MenuPage() {
               className={cn(
                 "shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-colors",
                 activeCategory === cat.id
-                  ? "bg-primary text-white"
-                  : "bg-stone-100 text-muted hover:bg-stone-200",
+                  ? "bg-customer-primary text-white"
+                  : "bg-zinc-100 text-foreground",
               )}
             >
               {cat.name}
+              {cat.name === "Popular" && " 🔥"}
             </button>
           ))}
         </div>
       </header>
 
-      <div className="flex-1 px-4 py-4 space-y-4 pb-28">
-        {items.map((item) => (
-          <Link
-            key={item.id}
-            href={item.isAvailable ? `/order/item/${item.id}` : "#"}
-            className={cn(
-              "flex gap-3 p-3 rounded-2xl border border-border bg-card transition-shadow",
-              item.isAvailable
-                ? "hover:shadow-md active:scale-[0.99]"
-                : "opacity-60 pointer-events-none",
-            )}
-          >
-            <div className="relative w-24 h-24 rounded-xl overflow-hidden shrink-0">
-              <Image
-                src={item.imageUrl}
-                alt={item.name}
-                fill
-                className="object-cover"
-                sizes="96px"
-              />
+      <div className="flex-1 px-5 py-5 space-y-8 pb-32">
+        {(activeCategory === "cat-all" || activeCategory === "cat-popular") && (
+          <section>
+            <h2 className="font-bold text-lg mb-3">Chef&apos;s Specials</h2>
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide -mx-1 px-1">
+              {specials.map((item) => (
+                <Link
+                  key={item.id}
+                  href={`/order/item/${item.id}`}
+                  className="shrink-0 w-72 rounded-2xl border border-border overflow-hidden bg-white shadow-sm"
+                >
+                  <div className="relative h-40">
+                    <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+                    {item.rating && (
+                      <span className="absolute top-3 left-3 px-2 py-1 rounded-lg bg-white/95 text-xs font-bold flex items-center gap-1">
+                        <Star size={12} className="fill-amber-400 text-amber-400" />
+                        {item.rating}
+                      </span>
+                    )}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex justify-between items-start gap-2">
+                      <h3 className="font-bold">{item.name}</h3>
+                      <span className="font-bold shrink-0">{formatCurrency(item.price)}</span>
+                    </div>
+                    <p className="text-xs text-muted mt-1 line-clamp-2">{item.description}</p>
+                    <Badge className="mt-2" variant="default">POPULAR</Badge>
+                  </div>
+                </Link>
+              ))}
             </div>
-            <div className="flex-1 min-w-0 flex flex-col">
-              <div className="flex items-start gap-2">
-                <DietIndicator diet={item.diet} />
-                <h3 className="font-semibold text-foreground leading-tight flex-1">
-                  {item.name}
-                </h3>
-              </div>
-              <p className="text-xs text-muted line-clamp-2 mt-1">{item.description}</p>
-              <div className="flex items-center justify-between mt-auto pt-2">
-                <span className="font-bold text-primary">
-                  {formatCurrency(item.price)}
-                </span>
-                {!item.isAvailable ? (
-                  <Badge variant="muted">Unavailable</Badge>
-                ) : (
-                  <span className="text-xs font-semibold text-primary">Add +</span>
-                )}
-              </div>
-            </div>
-          </Link>
-        ))}
+          </section>
+        )}
+
+        <section>
+          <h2 className="font-bold text-lg mb-3">Mains</h2>
+          <div className="space-y-4">
+            {(activeCategory === "cat-all" ? mains : items).map((item) => (
+              <Link
+                key={item.id}
+                href={`/order/item/${item.id}`}
+                className="flex gap-4 items-center"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <h3 className="font-semibold">{item.name}</h3>
+                    <DietIndicator diet={item.diet} />
+                  </div>
+                  <p className="text-sm font-bold mt-0.5">{formatCurrency(item.price)}</p>
+                </div>
+                <div className="relative w-20 h-20 rounded-xl overflow-hidden shrink-0">
+                  <Image src={item.imageUrl} alt={item.name} fill className="object-cover" />
+                </div>
+              </Link>
+            ))}
+          </div>
+        </section>
       </div>
 
       {itemCount > 0 && (
-        <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] p-4 bg-gradient-to-t from-card via-card to-transparent">
-          <Link href="/order/cart">
-            <Button size="lg" fullWidth>
-              View Cart ({itemCount} items)
-            </Button>
+        <div className="fixed bottom-16 inset-x-0 z-20 max-w-[430px] mx-auto px-5">
+          <Link
+            href="/order/cart"
+            className="flex items-center justify-between bg-customer-accent text-white rounded-2xl px-5 py-4 shadow-lg"
+          >
+            <div className="flex items-center gap-3">
+              <span className="w-8 h-8 rounded-full bg-green-800 flex items-center justify-center text-sm font-bold">
+                {itemCount}
+              </span>
+              <span className="font-bold">View Cart</span>
+            </div>
+            <span className="font-bold">{formatCurrency(total)}</span>
           </Link>
         </div>
       )}

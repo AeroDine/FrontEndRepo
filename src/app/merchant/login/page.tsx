@@ -3,66 +3,66 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { CheckCircle2 } from "lucide-react";
 import { AeroDineLogo } from "@/components/brand/aerodine-logo";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 export default function MerchantLoginPage() {
   const router = useRouter();
-  const [phone, setPhone] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!otpSent) {
-      setOtpSent(true);
-      return;
-    }
-    router.push("/merchant/dashboard");
-  };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-orange-50 to-amber-50 p-6">
-      <div className="w-full max-w-md bg-card rounded-3xl shadow-xl border border-border p-8 space-y-8 animate-slide-up">
-        <div className="text-center space-y-2">
-          <AeroDineLogo showTagline className="justify-center" />
-          <h1 className="text-xl font-bold pt-4">Merchant Login</h1>
-          <p className="text-sm text-muted">Sign in with your registered phone number</p>
-        </div>
+    <div className="min-h-screen lg:grid lg:grid-cols-2">
+      <div className="hidden lg:flex flex-col justify-center bg-[#0a1628] text-white p-12">
+        <AeroDineLogo variant="light" size="lg" className="mb-12" />
+        <h1 className="text-3xl font-extrabold max-w-md">
+          Welcome back to your restaurant dashboard.
+        </h1>
+        <p className="text-white/70 mt-4 max-w-md">
+          Manage orders, kitchen display, and payouts from one place.
+        </p>
+      </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="flex flex-col justify-center px-6 py-12 lg:px-16 bg-white">
+        <div className="lg:hidden mb-8">
+          <AeroDineLogo size="md" />
+        </div>
+        <div className="max-w-md w-full mx-auto space-y-6 animate-slide-up">
+          <div>
+            <h1 className="text-2xl font-bold">Merchant Login</h1>
+            <p className="text-sm text-muted mt-1">Sign in with your registered phone number</p>
+          </div>
+
           <Input
             id="phone"
-            label="Phone number"
+            label="Mobile Number"
             type="tel"
             placeholder="+91 98765 43210"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
             disabled={otpSent}
           />
           {otpSent && (
-            <Input
-              id="otp"
-              label="Enter OTP"
-              type="text"
-              placeholder="6-digit code"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value.replace(/\D/g, "").slice(0, 6))}
-              maxLength={6}
-            />
+            <Input id="otp" label="Enter OTP" placeholder="6-digit code" maxLength={6} />
           )}
-          <Button type="submit" size="lg" fullWidth>
+
+          <Button
+            size="lg"
+            fullWidth
+            onClick={() => {
+              if (!otpSent) setOtpSent(true);
+              else router.push("/merchant/dashboard");
+            }}
+          >
             {otpSent ? "Verify & Login" : "Send OTP"}
           </Button>
-        </form>
 
-        <p className="text-center text-sm text-muted">
-          New to AeroDine?{" "}
-          <Link href="/merchant/signup" className="text-primary font-semibold hover:underline">
-            Create account
-          </Link>
-        </p>
+          <p className="text-center text-sm text-muted">
+            New to AeroDine?{" "}
+            <Link href="/merchant/signup" className="text-primary font-semibold">
+              Create account
+            </Link>
+          </p>
+        </div>
       </div>
     </div>
   );

@@ -2,14 +2,13 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft, Minus, Plus } from "lucide-react";
+import { ArrowLeft, ChevronLeft, Flame, Heart, Minus, Plus, Star } from "lucide-react";
 import { use, useState } from "react";
 import { useRouter } from "next/navigation";
 import { MobileShell } from "@/components/layout/mobile-shell";
-import { DietIndicator } from "@/components/ui/diet-indicator";
 import { Button } from "@/components/ui/button";
 import { getMenuItem } from "@/lib/mock-data";
-import { formatCurrency, cn } from "@/lib/utils";
+import { formatCurrency } from "@/lib/utils";
 import { useCartStore } from "@/stores/cart-store";
 import { notFound } from "next/navigation";
 
@@ -22,43 +21,24 @@ export default function ItemPage({
   const item = getMenuItem(id);
   const router = useRouter();
   const addLine = useCartStore((s) => s.addLine);
-
   const [quantity, setQuantity] = useState(1);
   const [selectedVariant, setSelectedVariant] = useState(
-    item?.variants?.find((v) => v.isDefault)?.id ??
-      item?.variants?.[0]?.id,
+    item?.variants?.find((v) => v.isDefault)?.id ?? item?.variants?.[0]?.id,
   );
-  const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
 
   if (!item || !item.isAvailable) notFound();
 
   const variant = item.variants?.find((v) => v.id === selectedVariant);
-  const basePrice = variant?.price ?? item.price;
-  const addOnTotal = (item.addOns ?? [])
-    .filter((a) => selectedAddOns.includes(a.id))
-    .reduce((sum, a) => sum + a.price, 0);
-  const unitPrice = basePrice + addOnTotal;
-
-  const toggleAddOn = (addOnId: string) => {
-    setSelectedAddOns((prev) =>
-      prev.includes(addOnId)
-        ? prev.filter((id) => id !== addOnId)
-        : [...prev, addOnId],
-    );
-  };
+  const unitPrice = variant?.price ?? item.price;
 
   const handleAdd = () => {
-    const addOnNames = (item.addOns ?? [])
-      .filter((a) => selectedAddOns.includes(a.id))
-      .map((a) => a.name);
-
     addLine({
       itemId: item.id,
       name: item.name,
       variantId: variant?.id,
       variantName: variant?.name,
-      addOnIds: selectedAddOns,
-      addOnNames,
+      addOnIds: [],
+      addOnNames: [],
       quantity,
       unitPrice,
       diet: item.diet,
@@ -68,102 +48,103 @@ export default function ItemPage({
 
   return (
     <MobileShell>
-      <div className="relative h-56">
-        <Image src={item.imageUrl} alt={item.name} fill className="object-cover" priority />
-        <Link
-          href="/order/menu"
-          className="absolute top-4 left-4 w-10 h-10 rounded-full bg-card/90 backdrop-blur flex items-center justify-center shadow"
-        >
-          <ArrowLeft size={20} />
-        </Link>
-      </div>
-
-      <div className="flex-1 px-5 py-5 space-y-5 -mt-6 relative bg-card rounded-t-3xl animate-slide-up">
-        <div>
-          <div className="flex items-center gap-2 mb-2">
-            <DietIndicator diet={item.diet} size="md" />
-            <h1 className="text-xl font-bold">{item.name}</h1>
+      <div className="relative">
+        <div className="relative h-72 bg-zinc-100 flex items-center justify-center">
+          <div className="relative w-56 h-56 rounded-full overflow-hidden shadow-lg">
+            <Image src={item.imageUrl} alt={item.name} fill className="object-cover" priority />
           </div>
-          <p className="text-sm text-muted leading-relaxed">{item.description}</p>
+          <Link
+            href="/order/menu"
+            className="absolute top-4 left-4 w-10 h-10 rounded-full bg-white flex items-center justify-center shadow"
+          >
+            <ChevronLeft size={22} />
+          </Link>
+          <button
+            type="button"
+            className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white flex items-center justify-center shadow"
+            aria-label="Favorite"
+          >
+            <Heart size={20} />
+          </button>
         </div>
 
-        {item.variants && item.variants.length > 0 && (
-          <div>
-            <h2 className="text-sm font-semibold mb-2">Choose size</h2>
+        <div className="px-5 py-6 space-y-4 animate-slide-up">
+          <div className="flex items-start justify-between gap-4">
+            <h1 className="text-2xl font-extrabold flex-1">{item.name}</h1>
+            <span className="text-2xl font-extrabold">{formatCurrency(unitPrice)}</span>
+          </div>
+
+          <div className="flex items-center gap-3 text-sm text-muted">
+            {item.rating && (
+              <span className="flex items-center gap-1">
+                <Star size={14} className="fill-amber-400 text-amber-400" />
+                {item.rating} (128)
+              </span>
+            )}
+            {item.calories && (
+              <>
+                <span>•</span>
+                <span className="flex items-center gap-1">
+                  <Flame size={14} />
+                  {item.calories} kcal
+                </span>
+              </>
+            )}
+          </div>
+
+          <p className="text-sm text-muted leading-relaxed">{item.description}</p>
+
+          <div className="flex flex-wrap gap-2">
+            <span className="px-3 py-1.5 rounded-full bg-zinc-100 text-xs font-medium">
+              Contains Gluten
+            </span>
+            <span className="px-3 py-1.5 rounded-full bg-zinc-100 text-xs font-medium">
+              Contains Dairy
+            </span>
+          </div>
+
+          {item.variants && item.variants.length > 1 && (
             <div className="flex flex-wrap gap-2">
               {item.variants.map((v) => (
                 <button
                   key={v.id}
                   type="button"
                   onClick={() => setSelectedVariant(v.id)}
-                  className={cn(
-                    "px-4 py-2.5 rounded-xl border text-sm font-semibold transition-colors",
+                  className={`px-4 py-2 rounded-full text-sm font-medium border ${
                     selectedVariant === v.id
-                      ? "border-primary bg-primary-light text-primary-dark"
-                      : "border-border hover:border-primary/40",
-                  )}
+                      ? "border-customer-primary bg-customer-primary text-white"
+                      : "border-border"
+                  }`}
                 >
-                  {v.name} · {formatCurrency(v.price)}
+                  {v.name}
                 </button>
               ))}
             </div>
-          </div>
-        )}
-
-        {item.addOns && item.addOns.length > 0 && (
-          <div>
-            <h2 className="text-sm font-semibold mb-2">Add-ons</h2>
-            <div className="space-y-2">
-              {item.addOns.map((addOn) => (
-                <label
-                  key={addOn.id}
-                  className="flex items-center justify-between p-3 rounded-xl border border-border cursor-pointer hover:bg-stone-50"
-                >
-                  <div className="flex items-center gap-3">
-                    <input
-                      type="checkbox"
-                      checked={selectedAddOns.includes(addOn.id)}
-                      onChange={() => toggleAddOn(addOn.id)}
-                      className="w-4 h-4 accent-primary rounded"
-                    />
-                    <span className="text-sm font-medium">{addOn.name}</span>
-                  </div>
-                  <span className="text-sm font-semibold text-primary">
-                    +{formatCurrency(addOn.price)}
-                  </span>
-                </label>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="flex items-center justify-between pt-2">
-          <div className="flex items-center gap-3 bg-stone-100 rounded-xl p-1">
-            <button
-              type="button"
-              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-              className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-card"
-            >
-              <Minus size={18} />
-            </button>
-            <span className="w-8 text-center font-bold">{quantity}</span>
-            <button
-              type="button"
-              onClick={() => setQuantity((q) => q + 1)}
-              className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-card"
-            >
-              <Plus size={18} />
-            </button>
-          </div>
-          <span className="text-xl font-extrabold text-primary">
-            {formatCurrency(unitPrice * quantity)}
-          </span>
+          )}
         </div>
       </div>
 
-      <div className="p-4 border-t border-border">
-        <Button size="lg" fullWidth onClick={handleAdd}>
-          Add to Cart · {formatCurrency(unitPrice * quantity)}
+      <div className="mt-auto p-5 border-t border-border space-y-4 bg-white">
+        <div className="flex items-center justify-center gap-6">
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            className="w-10 h-10 rounded-full border border-border flex items-center justify-center"
+          >
+            <Minus size={18} />
+          </button>
+          <span className="text-xl font-bold w-8 text-center">{quantity}</span>
+          <button
+            type="button"
+            onClick={() => setQuantity((q) => q + 1)}
+            className="w-10 h-10 rounded-full border border-border flex items-center justify-center"
+          >
+            <Plus size={18} />
+          </button>
+        </div>
+        <Button variant="black" size="lg" fullWidth className="rounded-2xl" onClick={handleAdd}>
+          <span className="flex-1 text-left">Add to Order</span>
+          <span>{formatCurrency(unitPrice * quantity)}</span>
         </Button>
       </div>
     </MobileShell>

@@ -1,18 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  --background: #faf8f5;
-  --foreground: #1c1917;
+  --background: #f4f4f5;
+  --foreground: #09090b;
   --card: #ffffff;
-  --primary: #ea580c;
-  --primary-dark: #c2410c;
-  --primary-light: #ffedd5;
-  --muted: #78716c;
-  --border: #e7e5e4;
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-light: #dbeafe;
+  --muted: #71717a;
+  --border: #e4e4e7;
   --success: #16a34a;
   --danger: #dc2626;
   --veg: #16a34a;
   --non-veg: #dc2626;
+  --customer-primary: #171717;
+  --customer-accent: #16a34a;
+  --merchant-sidebar: #0f1419;
+  --merchant-sidebar-hover: #1a2332;
+  --merchant-surface: #111827;
+  --merchant-card: #1a2332;
 }
 
 @theme inline {
@@ -28,6 +34,12 @@
   --color-danger: var(--danger);
   --color-veg: var(--veg);
   --color-non-veg: var(--non-veg);
+  --color-customer-primary: var(--customer-primary);
+  --color-customer-accent: var(--customer-accent);
+  --color-merchant-sidebar: var(--merchant-sidebar);
+  --color-merchant-sidebar-hover: var(--merchant-sidebar-hover);
+  --color-merchant-surface: var(--merchant-surface);
+  --color-merchant-card: var(--merchant-card);
   --font-sans: var(--font-jakarta);
 }
 
@@ -50,27 +62,22 @@ body {
   margin: 0 auto;
   min-height: 100dvh;
   background: var(--card);
-  box-shadow: 0 0 60px rgb(28 25 23 / 8%);
+  box-shadow: 0 0 60px rgb(9 9 11 / 8%);
 }
 
 @media (min-width: 431px) {
-  body {
-    background: linear-gradient(135deg, #fff7ed 0%, #faf8f5 50%, #fef3c7 100%);
+  body:has(.mobile-shell) {
+    background: #e4e4e7;
   }
 }
 
-@keyframes pulse-soft {
-  0%,
-  100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.6;
-  }
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
 
-.animate-pulse-soft {
-  animation: pulse-soft 2s ease-in-out infinite;
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 
 @keyframes slide-up {

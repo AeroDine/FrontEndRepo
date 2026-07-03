@@ -1,37 +1,99 @@
+"use client";
+
+import {
+  Bell,
+  CreditCard,
+  Printer,
+  Receipt,
+  Store,
+  Ticket,
+  Users,
+} from "lucide-react";
 import { MerchantShell } from "@/components/layout/merchant-shell";
-import { PlanSelector } from "@/components/merchant/plan-selector";
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+
+const SETTINGS_NAV = [
+  { id: "profile", label: "Business Profile", icon: Store, active: true },
+  { id: "staff", label: "Staff & Roles", icon: Users },
+  { id: "taxes", label: "Taxes & Charges", icon: Receipt },
+  { id: "payments", label: "Payments & UPI", icon: CreditCard },
+  { id: "printers", label: "Printers & Devices", icon: Printer },
+  { id: "notifications", label: "Notifications", icon: Bell },
+  { id: "subscription", label: "Subscription", icon: Ticket },
+  { id: "support", label: "Support Tickets", icon: Ticket },
+];
 
 export default function SettingsPage() {
   return (
-    <MerchantShell>
-      <div className="space-y-8 max-w-2xl">
-        <div>
-          <h1 className="text-2xl font-bold">Settings & Subscription</h1>
-          <p className="text-sm text-muted">Manage your restaurant profile and plan</p>
+    <MerchantShell dark>
+      <div className="flex min-h-screen">
+        <aside className="w-56 shrink-0 border-r border-zinc-700 p-4 space-y-1">
+          {SETTINGS_NAV.map(({ id, label, icon: Icon, active }) => (
+            <button
+              key={id}
+              type="button"
+              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium ${
+                active
+                  ? "bg-primary text-white"
+                  : "text-zinc-400 hover:bg-merchant-card"
+              }`}
+            >
+              <Icon size={18} />
+              {label}
+            </button>
+          ))}
+        </aside>
+
+        <div className="flex-1 p-8 space-y-6">
+          <div className="flex items-start justify-between">
+            <div>
+              <h1 className="text-2xl font-bold text-white">Business Profile</h1>
+              <p className="text-sm text-zinc-400 mt-1">
+                Manage your cafe details, outlet information, and branding.
+              </p>
+            </div>
+            <Button size="sm">Save Changes</Button>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4 max-w-2xl">
+            <div className="h-28 rounded-xl border-2 border-dashed border-zinc-600 flex items-center justify-center text-sm text-zinc-500">
+              Upload Logo
+            </div>
+            <div className="h-28 rounded-xl border-2 border-dashed border-zinc-600 flex items-center justify-center text-sm text-zinc-500 sm:col-span-2">
+              Upload Cover Image (1200×400)
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4 max-w-3xl">
+            <Input id="biz-name" label="Business Name" defaultValue="AeroDine Cafe" className="bg-merchant-card border-zinc-600 text-white" />
+            <Input id="outlet-type" label="Outlet Type" defaultValue="Cafe / Coffee Shop" className="bg-merchant-card border-zinc-600 text-white" />
+            <Input id="phone" label="Phone Number" defaultValue="+91 98765 43210" className="bg-merchant-card border-zinc-600 text-white" />
+            <Input id="email" label="Email Address" defaultValue="hello@aerodinecafe.com" className="bg-merchant-card border-zinc-600 text-white" />
+            <div className="sm:col-span-2">
+              <label className="text-sm font-medium text-white">Outlet Address</label>
+              <textarea
+                className="mt-1.5 w-full h-20 px-4 py-3 rounded-xl border border-zinc-600 bg-merchant-card text-sm text-white"
+                defaultValue="123, 1st Floor, High Street, Downtown, Bangalore - 560001"
+              />
+            </div>
+            <Input id="fssai" label="FSSAI License Number" defaultValue="11223344556677" className="bg-merchant-card border-zinc-600 text-white" />
+            <Input id="gstin" label="GSTIN (Optional)" defaultValue="29ABCDE1234F1Z5" className="bg-merchant-card border-zinc-600 text-white" />
+          </div>
+
+          <section className="max-w-3xl">
+            <h2 className="font-semibold text-white mb-4">Operating Hours</h2>
+            <label className="flex items-center gap-3 text-sm text-zinc-300 mb-3">
+              <input type="checkbox" defaultChecked className="accent-primary" />
+              Monday – Friday
+            </label>
+            <div className="flex items-center gap-3">
+              <input type="time" defaultValue="09:00" className="h-11 px-3 rounded-xl border border-zinc-600 bg-merchant-card text-white text-sm" />
+              <span className="text-zinc-500">to</span>
+              <input type="time" defaultValue="23:00" className="h-11 px-3 rounded-xl border border-zinc-600 bg-merchant-card text-white text-sm" />
+            </div>
+          </section>
         </div>
-
-        <section className="p-5 rounded-2xl bg-card border border-border space-y-4">
-          <h2 className="font-bold">Restaurant Details</h2>
-          <Input id="name" label="Restaurant name" defaultValue="Spice Garden" />
-          <Input id="gst" label="GST number" defaultValue="27AABCU9603R1ZM" />
-          <Input id="phone" label="Owner phone" defaultValue="+91 98765 43210" />
-          <Input id="email" label="Owner email" defaultValue="rajan@spicegarden.in" />
-          <Button>Save Changes</Button>
-        </section>
-
-        <section className="p-5 rounded-2xl bg-card border border-border space-y-4">
-          <h2 className="font-bold">Billing Details</h2>
-          <Input id="billing-address" label="Billing address" defaultValue="Shop 12, FC Road, Pune" />
-          <Input id="billing-gst" label="Billing GSTIN" defaultValue="27AABCU9603R1ZM" />
-        </section>
-
-        <section className="p-5 rounded-2xl bg-card border border-border space-y-4">
-          <h2 className="font-bold">Current Plan</h2>
-          <p className="text-sm text-muted">Next billing date: 1 July 2026</p>
-          <PlanSelector nextHref="/merchant/settings" />
-        </section>
       </div>
     </MerchantShell>
   );

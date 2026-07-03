@@ -25,6 +25,8 @@ export interface MenuItem {
   isAvailable: boolean;
   variants?: MenuVariant[];
   addOns?: MenuAddOn[];
+  rating?: number;
+  calories?: number;
 }
 
 export interface MenuCategory {

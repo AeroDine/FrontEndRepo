@@ -5,26 +5,50 @@ export function AeroDineLogo({
   className,
   showTagline = false,
   size = "md",
+  variant = "default",
 }: {
   className?: string;
   showTagline?: boolean;
   size?: "sm" | "md" | "lg";
+  variant?: "default" | "light" | "dark";
 }) {
-  const iconSize = size === "sm" ? 20 : size === "lg" ? 32 : 24;
+  const iconSize = size === "sm" ? 18 : size === "lg" ? 28 : 22;
   const textSize =
-    size === "sm" ? "text-lg" : size === "lg" ? "text-3xl" : "text-xl";
+    size === "sm" ? "text-base" : size === "lg" ? "text-2xl" : "text-lg";
+  const isLight = variant === "light";
 
   return (
     <div className={cn("flex items-center gap-2.5", className)}>
-      <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-white shadow-lg shadow-primary/30">
+      <div
+        className={cn(
+          "flex items-center justify-center rounded-lg",
+          size === "sm" ? "w-8 h-8" : size === "lg" ? "w-11 h-11" : "w-9 h-9",
+          isLight
+            ? "bg-white/10 text-white"
+            : "bg-primary text-white shadow-sm",
+        )}
+      >
         <UtensilsCrossed size={iconSize} strokeWidth={2.5} />
       </div>
       <div>
-        <span className={cn("font-extrabold tracking-tight text-foreground", textSize)}>
-          Aero<span className="text-primary">Dine</span>
+        <span
+          className={cn(
+            "font-bold tracking-tight",
+            textSize,
+            isLight ? "text-white" : "text-foreground",
+          )}
+        >
+          AeroDine
         </span>
         {showTagline && (
-          <p className="text-xs text-muted font-medium">QR Restaurant Ordering</p>
+          <p
+            className={cn(
+              "text-xs font-medium",
+              isLight ? "text-white/70" : "text-muted",
+            )}
+          >
+            QR Restaurant Ordering
+          </p>
         )}
       </div>
     </div>

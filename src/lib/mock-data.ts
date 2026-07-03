@@ -10,24 +10,23 @@ import type {
 
 export const DEMO_RESTAURANT: Restaurant = {
   id: "rest-1",
-  name: "Spice Garden",
-  slug: "spice-garden",
-  tagline: "Authentic Pune flavours since 2018",
+  name: "The Rustic Spoon",
+  slug: "the-rustic-spoon",
+  tagline: "Scan to Order • Artisan Kitchen",
   tableNumber: "12",
   gstin: "27AABCU9603R1ZM",
-  city: "Pune",
+  city: "Bangalore",
 };
 
 export const MENU_SECTIONS: MenuSection[] = [
-  { id: "sec-lunch", name: "Lunch" },
-  { id: "sec-dinner", name: "Dinner" },
+  { id: "sec-all", name: "All" },
 ];
 
 export const MENU_CATEGORIES: MenuCategory[] = [
-  { id: "cat-starters", sectionId: "sec-lunch", name: "Starters", sortOrder: 1 },
-  { id: "cat-mains", sectionId: "sec-lunch", name: "Mains", sortOrder: 2 },
-  { id: "cat-biryani", sectionId: "sec-lunch", name: "Biryani", sortOrder: 3 },
-  { id: "cat-beverages", sectionId: "sec-lunch", name: "Beverages", sortOrder: 4 },
+  { id: "cat-all", sectionId: "sec-all", name: "All Items", sortOrder: 0 },
+  { id: "cat-popular", sectionId: "sec-all", name: "Popular", sortOrder: 1 },
+  { id: "cat-mains", sectionId: "sec-all", name: "Mains", sortOrder: 2 },
+  { id: "cat-sides", sectionId: "sec-all", name: "Sides", sortOrder: 3 },
 ];
 
 const ADD_ONS: Record<string, MenuAddOn[]> = {
@@ -43,12 +42,57 @@ const ADD_ONS: Record<string, MenuAddOn[]> = {
 
 export const MENU_ITEMS: MenuItem[] = [
   {
+    id: "item-burger",
+    name: "Truffle Mushroom Burger",
+    description:
+      "Wagyu beef patty, wild mushrooms, truffle aioli, aged cheddar on brioche.",
+    categoryId: "cat-popular",
+    price: 1540,
+    imageUrl:
+      "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&h=400&fit=crop",
+    diet: "non-veg",
+    isAvailable: true,
+    rating: 4.9,
+  },
+  {
+    id: "item-pizza",
+    name: "Classic Margherita Pizza",
+    description:
+      "Authentic Neapolitan style pizza with San Marzano tomato sauce, fresh mozzarella di bufala, fresh basil leaves, and a drizzle of extra virgin olive oil on our 48-hour fermented sourdough crust.",
+    categoryId: "cat-mains",
+    price: 1320,
+    imageUrl:
+      "https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&h=400&fit=crop",
+    diet: "veg",
+    isAvailable: true,
+    rating: 4.9,
+    calories: 850,
+    variants: [
+      { id: "var-regular", name: "Regular (10\")", price: 1320, isDefault: true },
+      { id: "var-large", name: "Large (14\")", price: 1820, isDefault: false },
+    ],
+  },
+  {
+    id: "item-latte",
+    name: "Iced Caramel Latte",
+    description: "Espresso with caramel syrup, oat milk, and ice.",
+    categoryId: "cat-sides",
+    price: 650,
+    imageUrl:
+      "https://images.unsplash.com/photo-1461023058943-07fcbe16d735?w=600&h=400&fit=crop",
+    diet: "veg",
+    isAvailable: true,
+    variants: [
+      { id: "var-oat", name: "Oat Milk, Less Ice", price: 650, isDefault: true },
+    ],
+  },
+  {
     id: "item-1",
     name: "Paneer Tikka",
     description:
-      "Char-grilled cottage cheese with bell peppers, mint chutney, and smoked spices.",
-    categoryId: "cat-starters",
-    price: 249,
+      "Cottage cheese marinated in yogurt and spices, cooked in tandoor.",
+    categoryId: "cat-popular",
+    price: 280,
     imageUrl:
       "https://images.unsplash.com/photo-1565557623262-b51c2513a641?w=600&h=400&fit=crop",
     diet: "veg",
@@ -58,94 +102,53 @@ export const MENU_ITEMS: MenuItem[] = [
     id: "item-2",
     name: "Chicken 65",
     description: "Crispy Andhra-style fried chicken with curry leaves and red chilli.",
-    categoryId: "cat-starters",
+    categoryId: "cat-mains",
     price: 299,
     imageUrl:
       "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=600&h=400&fit=crop",
     diet: "non-veg",
     isAvailable: true,
   },
-  {
-    id: "item-3",
-    name: "Hyderabadi Chicken Biryani",
-    description: "Slow-cooked basmati rice with tender chicken, saffron, and fried onions.",
-    categoryId: "cat-biryani",
-    price: 349,
-    imageUrl:
-      "https://images.unsplash.com/photo-1563379091339-03246963d29f?w=600&h=400&fit=crop",
-    diet: "non-veg",
-    isAvailable: true,
-    variants: [
-      { id: "var-half", name: "Half", price: 249, isDefault: false },
-      { id: "var-full", name: "Full", price: 349, isDefault: true },
-    ],
-    addOns: ADD_ONS.biryani,
-  },
-  {
-    id: "item-4",
-    name: "Masala Dosa",
-    description: "Crisp rice crepe filled with spiced potato masala, served with sambar.",
-    categoryId: "cat-mains",
-    price: 180,
-    imageUrl:
-      "https://images.unsplash.com/photo-1630384060420-cbb7592843f8?w=600&h=400&fit=crop",
-    diet: "veg",
-    isAvailable: true,
-    addOns: ADD_ONS.dosa,
-  },
-  {
-    id: "item-5",
-    name: "Dal Tadka",
-    description: "Yellow lentils tempered with garlic, cumin, and ghee. Served with rice.",
-    categoryId: "cat-mains",
-    price: 220,
-    imageUrl:
-      "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=600&h=400&fit=crop",
-    diet: "veg",
-    isAvailable: false,
-  },
-  {
-    id: "item-6",
-    name: "Fresh Lime Soda",
-    description: "Sweet or salted — your choice of refreshing lime soda.",
-    categoryId: "cat-beverages",
-    price: 90,
-    imageUrl:
-      "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=600&h=400&fit=crop",
-    diet: "veg",
-    isAvailable: true,
-    variants: [
-      { id: "var-sweet", name: "Sweet", price: 90, isDefault: true },
-      { id: "var-salt", name: "Salt", price: 90 },
-    ],
-  },
 ];
 
 export const SUBSCRIPTION_PLANS: SubscriptionPlan[] = [
   {
-    id: "plan-basic",
-    name: "QR Basic",
-    code: "QR_BASIC",
-    price: 1999,
+    id: "plan-starter",
+    name: "Starter",
+    code: "STARTER",
+    price: 999,
     features: [
       "Up to 500 orders/month",
-      "Digital menu & QR ordering",
-      "Kitchen display",
-      "Email support",
+      "QR Code Ordering",
+      "Basic Order Management",
+      "2 Staff Accounts",
     ],
   },
   {
     id: "plan-pro",
-    name: "QR Pro",
-    code: "QR_PRO",
-    price: 2999,
+    name: "Pro",
+    code: "PRO",
+    price: 2499,
     recommended: true,
     features: [
       "Unlimited orders",
-      "Takeaway + dine-in",
-      "Analytics dashboard",
-      "WhatsApp notifications",
-      "Priority support",
+      "1 Kitchen Display System (KDS)",
+      "Advanced Analytics",
+      "10 Staff Accounts",
+      "Priority Support",
+    ],
+  },
+  {
+    id: "plan-enterprise",
+    name: "Enterprise",
+    code: "ENTERPRISE",
+    price: 4999,
+    features: [
+      "Multiple Outlets Support",
+      "Unlimited KDS Screens",
+      "Custom API Access",
+      "Unlimited Staff Accounts",
+      "Dedicated Account Manager",
     ],
   },
 ];
