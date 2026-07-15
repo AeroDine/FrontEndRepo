@@ -1,21 +1,33 @@
+"use client";
+
+import { useState } from "react";
 import {
   Bell,
-  ChefHat,
   ClipboardList,
-  IndianRupee,
   Plus,
   QrCode,
-  TrendingUp,
   UserPlus,
+  type LucideIcon,
 } from "lucide-react";
 import { MerchantShell } from "@/components/layout/merchant-shell";
-import { formatCurrency } from "@/lib/utils";
+import { MenuItemModal } from "@/components/merchant/modals/menu-item-modal";
+import { AddStaffModal } from "@/components/merchant/modals/add-staff-modal";
+import { QrManageModal } from "@/components/merchant/modals/qr-manage-modal";
+import { ManualOrderModal } from "@/components/merchant/modals/manual-order-modal";
+import { cn } from "@/lib/utils";
 
-const quickActions = [
-  { label: "Create Menu Item", icon: Plus },
-  { label: "Add Staff", icon: UserPlus },
-  { label: "Download QRs", icon: QrCode },
-  { label: "Manual Order", icon: ClipboardList },
+type ActionId = "menu" | "staff" | "qr" | "order";
+
+const quickActions: {
+  id: ActionId;
+  label: string;
+  hint: string;
+  icon: LucideIcon;
+}[] = [
+  { id: "menu", label: "Create Menu Item", hint: "Add a dish", icon: Plus },
+  { id: "staff", label: "Add Staff", hint: "Invite team", icon: UserPlus },
+  { id: "qr", label: "Download QRs", hint: "Table codes", icon: QrCode },
+  { id: "order", label: "Manual Order", hint: "Walk-in / phone", icon: ClipboardList },
 ];
 
 const stats = [
@@ -26,6 +38,8 @@ const stats = [
 ];
 
 export default function DashboardPage() {
+  const [activeModal, setActiveModal] = useState<ActionId | null>(null);
+
   return (
     <MerchantShell>
       <div className="p-6 lg:p-8 space-y-6">
@@ -36,22 +50,32 @@ export default function DashboardPage() {
               <option>AeroDine Cafe — Downtown</option>
             </select>
           </div>
-          <button type="button" className="p-2.5 rounded-xl border border-border bg-white" aria-label="Notifications">
+          <button
+            type="button"
+            className="p-2.5 rounded-xl border border-border bg-white hover:bg-zinc-50 transition-colors"
+            aria-label="Notifications"
+          >
             <Bell size={20} />
           </button>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
-          {quickActions.map(({ label, icon: Icon }) => (
+          {quickActions.map(({ id, label, hint, icon: Icon }) => (
             <button
-              key={label}
+              key={id}
               type="button"
-              className="p-4 rounded-2xl bg-white border border-border text-center hover:shadow-sm transition-shadow"
+              onClick={() => setActiveModal(id)}
+              className={cn(
+                "group p-4 rounded-2xl bg-white border border-border text-left",
+                "hover:border-primary/35 hover:shadow-md hover:shadow-primary/5",
+                "active:scale-[0.98] transition-all duration-200",
+              )}
             >
-              <div className="w-10 h-10 mx-auto rounded-xl bg-primary-light text-primary flex items-center justify-center mb-2">
+              <div className="w-11 h-11 rounded-xl bg-primary-light text-primary flex items-center justify-center mb-3 group-hover:bg-primary group-hover:text-white transition-colors">
                 <Icon size={20} />
               </div>
-              <p className="text-xs font-semibold">{label}</p>
+              <p className="text-sm font-semibold leading-snug">{label}</p>
+              <p className="text-xs text-muted mt-0.5">{hint}</p>
             </button>
           ))}
         </div>
@@ -62,7 +86,11 @@ export default function DashboardPage() {
               <p className="text-sm text-muted">{label}</p>
               <p className="text-2xl font-extrabold mt-1">{value}</p>
               {change && (
-                <p className={`text-xs font-semibold mt-1 ${positive ? "text-customer-accent" : "text-danger"}`}>
+                <p
+                  className={`text-xs font-semibold mt-1 ${
+                    positive ? "text-customer-accent" : "text-danger"
+                  }`}
+                >
                   {change}
                 </p>
               )}
@@ -78,7 +106,7 @@ export default function DashboardPage() {
               {[20, 35, 25, 40, 30, 55, 90].map((h, i) => (
                 <div key={i} className="flex-1 flex flex-col items-center gap-1">
                   <div
-                    className="w-full rounded-t bg-primary/80"
+                    className="w-full rounded-t bg-primary/80 transition-all hover:bg-primary"
                     style={{ height: `${h}%` }}
                   />
                   <span className="text-[10px] text-muted">
@@ -93,8 +121,12 @@ export default function DashboardPage() {
             <h2 className="font-bold">System Alerts</h2>
             <div className="p-4 rounded-xl bg-red-50 border border-red-100 text-sm">
               <p className="font-semibold text-red-900">KDS Offline</p>
-              <p className="text-red-700 text-xs mt-1">Kitchen Display System 2 (Bar) has lost connection.</p>
-              <button type="button" className="text-xs text-primary font-semibold mt-2">Reconnect</button>
+              <p className="text-red-700 text-xs mt-1">
+                Kitchen Display System 2 (Bar) has lost connection.
+              </p>
+              <button type="button" className="text-xs text-primary font-semibold mt-2 hover:underline">
+                Reconnect
+              </button>
             </div>
             <div className="p-4 rounded-xl bg-amber-50 border border-amber-100 text-sm">
               <p className="font-semibold text-amber-900">Printer Warning</p>
@@ -103,11 +135,26 @@ export default function DashboardPage() {
             <div className="p-4 rounded-xl bg-zinc-50 border border-border text-sm">
               <p className="font-semibold">Low Stock</p>
               <p className="text-muted text-xs mt-1">Paneer Tikka is low on stock (2 left).</p>
-              <button type="button" className="text-xs text-primary font-semibold mt-2">Update Menu</button>
+              <button
+                type="button"
+                className="text-xs text-primary font-semibold mt-2 hover:underline"
+                onClick={() => setActiveModal("menu")}
+              >
+                Update Menu
+              </button>
             </div>
           </div>
         </div>
       </div>
+
+      <MenuItemModal
+        open={activeModal === "menu"}
+        onClose={() => setActiveModal(null)}
+        mode="create"
+      />
+      <AddStaffModal open={activeModal === "staff"} onClose={() => setActiveModal(null)} />
+      <QrManageModal open={activeModal === "qr"} onClose={() => setActiveModal(null)} />
+      <ManualOrderModal open={activeModal === "order"} onClose={() => setActiveModal(null)} />
     </MerchantShell>
   );
 }
